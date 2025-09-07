@@ -253,7 +253,7 @@ export default function ListCard({
             .order("frequency", { ascending: false })
             .limit(8);
           if (error) throw error;
-          remote = (data || []).map((d: any) => ({
+          remote = (data || []).map((d: { id: string; name: string; category: string; confidence: string | null; frequency: number }) => ({
             id: d.id,
             name: d.name,
             category: d.category,

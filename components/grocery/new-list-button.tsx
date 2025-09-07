@@ -24,6 +24,10 @@ export default function NewListButton({ userId, onListCreated, onOptimisticCreat
     if (isCreating) return
     
     setIsCreating(true)
+    
+    // Optimistically insert a placeholder list at the top
+    const tempId = `temp-${Date.now()}`
+    
     try {
       const formattedTitle = new Intl.DateTimeFormat(undefined, {
         year: 'numeric',
@@ -32,9 +36,6 @@ export default function NewListButton({ userId, onListCreated, onOptimisticCreat
         hour: 'numeric',
         minute: '2-digit'
       }).format(new Date())
-
-      // Optimistically insert a placeholder list at the top
-      const tempId = `temp-${Date.now()}`
       const tempList: ListWithItems = {
         id: tempId,
         user_id: userId,

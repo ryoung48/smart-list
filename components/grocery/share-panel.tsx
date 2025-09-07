@@ -31,8 +31,9 @@ export default function SharePanel({ listId, isOwner, onChanged }: SharePanelPro
       const { data, error } = await supabase.rpc('get_list_collaborators', { p_list_id: listId })
       if (error) throw error
       setCollabs((data || []) as Collaborator[])
-    } catch (e: any) {
-      showToast({ title: 'Failed to load collaborators', description: e?.message || String(e), variant: 'error' })
+    } catch (e: unknown) {
+      const errorMessage = e instanceof Error ? e.message : String(e)
+      showToast({ title: 'Failed to load collaborators', description: errorMessage, variant: 'error' })
     } finally {
       setLoading(false)
     }
@@ -57,8 +58,9 @@ export default function SharePanel({ listId, isOwner, onChanged }: SharePanelPro
       await load()
       onChanged?.()
       showToast({ title: 'Collaborator added', variant: 'success' })
-    } catch (e: any) {
-      showToast({ title: 'Failed to add collaborator', description: e?.message || String(e), variant: 'error' })
+    } catch (e: unknown) {
+      const errorMessage = e instanceof Error ? e.message : String(e)
+      showToast({ title: 'Failed to add collaborator', description: errorMessage, variant: 'error' })
     } finally {
       setLoading(false)
     }
@@ -75,8 +77,9 @@ export default function SharePanel({ listId, isOwner, onChanged }: SharePanelPro
       await load()
       onChanged?.()
       showToast({ title: 'Collaborator removed', variant: 'success' })
-    } catch (e: any) {
-      showToast({ title: 'Failed to remove collaborator', description: e?.message || String(e), variant: 'error' })
+    } catch (e: unknown) {
+      const errorMessage = e instanceof Error ? e.message : String(e)
+      showToast({ title: 'Failed to remove collaborator', description: errorMessage, variant: 'error' })
     } finally {
       setLoading(false)
     }
@@ -95,8 +98,9 @@ export default function SharePanel({ listId, isOwner, onChanged }: SharePanelPro
       await load()
       onChanged?.()
       showToast({ title: 'Role updated', variant: 'success' })
-    } catch (e: any) {
-      showToast({ title: 'Failed to update role', description: e?.message || String(e), variant: 'error' })
+    } catch (e: unknown) {
+      const errorMessage = e instanceof Error ? e.message : String(e)
+      showToast({ title: 'Failed to update role', description: errorMessage, variant: 'error' })
     } finally {
       setLoading(false)
     }
