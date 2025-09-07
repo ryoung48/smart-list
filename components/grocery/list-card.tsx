@@ -325,7 +325,10 @@ export default function ListCard({
         completed ? "opacity-75" : ""
       } w-full`}
     >
-      <div className="flex items-center justify-between mb-2">
+      <div 
+        className="flex items-center justify-between mb-2 cursor-pointer hover:bg-gray-50/50 rounded-lg p-2 -m-2 transition-colors"
+        onClick={toggleExpanded}
+      >
         <div className="min-w-0 flex-1">
           <h3 className="text-sm sm:text-base font-semibold text-gray-900 truncate">
             {titleText}
@@ -342,9 +345,31 @@ export default function ListCard({
           </div>
         </div>
         <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0">
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              toggleExpanded();
+            }}
+            className="text-xs border border-gray-200 text-gray-700 hover:bg-gray-50 px-3 py-2 sm:px-2 sm:py-1 rounded inline-flex items-center gap-1 min-h-[36px] sm:min-h-0"
+          >
+            {isExpanded ? (
+              <>
+                <ChevronUp className="w-4 h-4" />
+                <span className="hidden sm:inline">Collapse</span>
+              </>
+            ) : (
+              <>
+                <ChevronDown className="w-4 h-4" />
+                <span className="hidden sm:inline">Expand</span>
+              </>
+            )}
+          </button>
           {isOwner ? (
             <button
-              onClick={() => setShareOpen(true)}
+              onClick={(e) => {
+                e.stopPropagation();
+                setShareOpen(true);
+              }}
               className="text-xs border border-gray-200 text-gray-700 hover:bg-gray-50 px-3 py-2 sm:px-2 sm:py-1 rounded inline-flex items-center gap-1 min-h-[36px] sm:min-h-0"
             >
               <Share2 className="w-4 h-4" />
@@ -360,26 +385,12 @@ export default function ListCard({
               <span className="hidden sm:inline">Shared</span>
             </button>
           )}
-          <button
-            onClick={toggleExpanded}
-            className="text-xs border border-gray-200 text-gray-700 hover:bg-gray-50 px-3 py-2 sm:px-2 sm:py-1 rounded inline-flex items-center gap-1 min-h-[36px] sm:min-h-0"
-          >
-            {isExpanded ? (
-              <>
-                <ChevronUp className="w-4 h-4" />
-                <span className="hidden sm:inline">Collapse</span>
-              </>
-            ) : (
-              <>
-                <ChevronDown className="w-4 h-4" />
-                <span className="hidden sm:inline">Expand</span>
-              </>
-            )}
-          </button>
-          {/* Finish button removed; replaced with Check All inside expanded area */}
           {!completed && (
             <button
-              onClick={handleDeleteList}
+              onClick={(e) => {
+                e.stopPropagation();
+                handleDeleteList();
+              }}
               className="text-xs border border-red-200 text-red-700 hover:bg-red-50 px-3 py-2 sm:px-2 sm:py-1 rounded inline-flex items-center gap-1 disabled:opacity-50 min-h-[36px] sm:min-h-0"
               title="Delete list"
               disabled={isTemp}
@@ -406,71 +417,8 @@ export default function ListCard({
             )}
           </div>
 
-          <div className="space-y-1 max-h-56 overflow-auto pr-1 mb-2">
-            {list.items.map((item) => (
-              <div
-                key={item.id}
-                className="flex items-center justify-between cursor-pointer select-none"
-                onClick={() => handleToggleItem(item)}
-                role="button"
-                tabIndex={0}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" || e.key === " ")
-                    handleToggleItem(item);
-                }}
-              >
-                <label className="flex items-center gap-2 min-w-0">
-                  <input
-                    type="checkbox"
-                    checked={!!item.checked_at}
-                    onChange={() => handleToggleItem(item)}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                    }}
-                    className="h-4 w-4 rounded border-gray-300 text-green-600 focus:ring-green-500"
-                    disabled={updatingItems.has(item.id)}
-                  />
-                  <span
-                    className={`text-sm truncate ${
-                      item.checked_at
-                        ? "line-through text-gray-500"
-                        : "text-gray-700"
-                    }`}
-                  >
-                    {item.name}
-                  </span>
-                  {item.predicted && (
-                    <span className="text-[10px] bg-blue-100 text-blue-700 px-1 py-0.5 rounded">
-                      auto
-                    </span>
-                  )}
-                </label>
-                <div className="flex items-center gap-2">
-                  <span className="text-[10px] text-gray-500">
-                    {item.checked_at
-                      ? `Checked ${formatDateTime(item.checked_at)}`
-                      : `Added ${formatDateTime(item.created_at)}`}
-                  </span>
-                  <button
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDeleteItem(item.id, item.name);
-                    }}
-                    className="text-xs text-red-600 hover:text-red-700 inline-flex items-center gap-1"
-                    title="Remove item"
-                    aria-label="Remove item"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
-              </div>
-            ))}
-            {list.items.length === 0 && (
-              <p className="text-xs text-gray-500">No items yet.</p>
-            )}
-          </div>
-
-          <div className="relative">
+          {/* Action buttons - moved to top for better mobile UX */}
+          <div className="relative mb-3">
             <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2">
               <button
                 onClick={handleCheckAll}
@@ -535,6 +483,70 @@ export default function ListCard({
                   </button>
                 ))}
               </div>
+            )}
+          </div>
+
+          <div className="space-y-1 max-h-56 overflow-auto pr-1 mb-2">
+            {list.items.map((item) => (
+              <div
+                key={item.id}
+                className="flex items-center justify-between cursor-pointer select-none"
+                onClick={() => handleToggleItem(item)}
+                role="button"
+                tabIndex={0}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter" || e.key === " ")
+                    handleToggleItem(item);
+                }}
+              >
+                <label className="flex items-center gap-2 min-w-0">
+                  <input
+                    type="checkbox"
+                    checked={!!item.checked_at}
+                    onChange={() => handleToggleItem(item)}
+                    onClick={(e) => {
+                      e.stopPropagation();
+                    }}
+                    className="h-4 w-4 rounded border-gray-300 text-green-600 focus:ring-green-500"
+                    disabled={updatingItems.has(item.id)}
+                  />
+                  <span
+                    className={`text-sm truncate ${
+                      item.checked_at
+                        ? "line-through text-gray-500"
+                        : "text-gray-700"
+                    }`}
+                  >
+                    {item.name}
+                  </span>
+                  {item.predicted && (
+                    <span className="text-[10px] bg-blue-100 text-blue-700 px-1 py-0.5 rounded">
+                      auto
+                    </span>
+                  )}
+                </label>
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] text-gray-500">
+                    {item.checked_at
+                      ? `Checked ${formatDateTime(item.checked_at)}`
+                      : `Added ${formatDateTime(item.created_at)}`}
+                  </span>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeleteItem(item.id, item.name);
+                    }}
+                    className="text-xs text-red-600 hover:text-red-700 inline-flex items-center gap-1"
+                    title="Remove item"
+                    aria-label="Remove item"
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
+                </div>
+              </div>
+            ))}
+            {list.items.length === 0 && (
+              <p className="text-xs text-gray-500">No items yet.</p>
             )}
           </div>
         </>
